@@ -1,0 +1,17 @@
+.MuiDataGrid-row.Mui-even {
+    background-color: lightgrey;
+  }
+
+.header-column{
+    background-color: lightslategray;
+}
+
+.hidden{
+    display: none;
+}
+.cell-pass{
+    color: green;
+}
+.cell-fail{
+    color: red;
+}
