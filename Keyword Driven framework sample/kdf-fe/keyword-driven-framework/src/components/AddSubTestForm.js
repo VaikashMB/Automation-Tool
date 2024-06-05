@@ -2,23 +2,22 @@ import { Box, Button, FormControlLabel, TextField, Typography, Checkbox, FormCon
 import React, { useEffect, useState } from 'react'
 import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
+import AddLocatorDialog from './AddLocatorDialog';
 
-const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests, subTestData, subTestsLength }) => {
+const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests, subTestData, subTestsLength}) => {
 
+    const [showAddLocatorDialog, setShowAddLocatorDialog] = useState(false)
+    const [errors, setErrors] = useState({})
+    const [locatorOptions, setLocatorOptions] = useState([]);
     const [formData, setFormData] = useState({
         keyword: '',
         orderOfExecution: '',
         description: '',
-        locatorType: '',
-        locatorValue: '',
         value: '',
-        locatorType2: '',
-        locatorValue2: '',
+        locatorId: '',
         flag: '',
         screenshot: false
     })
-
-    const [errors, setErrors] = useState({})
 
     const keywords = [
         'goToURL',
@@ -61,17 +60,23 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
         if (!formData.keyword) tempErrors.keyword = "Keyword is required";
         if (!formData.orderOfExecution) tempErrors.orderOfExecution = "Order of Execution is required";
         if (!formData.description) tempErrors.description = "Description is required";
-        if (!formData.locatorType) tempErrors.locatorType = "Locator Type is required";
-        if (!formData.locatorValue) tempErrors.locatorValue = "Locator Value is required";
         if (!formData.value) tempErrors.value = "Value is required";
-        if (!formData.locatorType2) tempErrors.locatorType = "Locator Type 2 is required";
-        if (!formData.locatorValue2) tempErrors.locatorValue = "Locator Value 2 is required";
+        if (!formData.locatorId) tempErrors.locatorId = "Locator ID is required";
         if (!formData.flag) tempErrors.flag = "Flag is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
 
     useEffect(() => {
+        if (selectedTest) {
+            axios.get(`http://localhost:8081/getLocatorsUnderTestId/${selectedTest}`)
+                .then(response => {
+                    setLocatorOptions(response.data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
         if (subTestData) {
             setFormData(subTestData);
         } else {
@@ -80,13 +85,13 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                 orderOfExecution: subTestsLength + 1
             }));
         }
-    }, [subTestData, subTestsLength]);
+    }, [selectedTest, subTestData, subTestsLength]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
-            [name]: value
+            [name]: name === 'locatorId' ? JSON.parse(value) : value
         }));
     };
 
@@ -131,6 +136,14 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
             });
     };
 
+    const handleAddNewLocator = () => {
+        setShowAddLocatorDialog(true)
+    }
+
+    const handleCloseLocatorDialog = () => {
+        setShowAddLocatorDialog(false);
+    }
+
     return (
         <Box sx={{
             padding: '22px', border: '0px solid #ccc',
@@ -138,7 +151,7 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
         }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography sx={{ font: 'sans-serif' }} variant='h5'>
-                    {subTestData ? 'Update SubTest' : 'New SubTest'}
+                    New SubTest
                 </Typography>
                 <Button
                     color="secondary"
@@ -202,68 +215,24 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                 helperText={errors.description}
             />
             <Stack direction='row' gap='10px'>
-                <TextField
-                    autoFocus
-                    required
-                    margin="dense"
-                    id="locatorType"
-                    name="locatorType"
-                    label="Locator-Type 1"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={formData.locatorType}
-                    onChange={handleInputChange}
-                    error={!!errors.locatorType}
-                    helperText={errors.locatorType}
-                />
-                <TextField
-                    autoFocus
-                    required
-                    margin="dense"
-                    id="locatorValue"
-                    name="locatorValue"
-                    label="Locator-Value 1"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={formData.locatorValue}
-                    onChange={handleInputChange}
-                    error={!!errors.locatorValue}
-                    helperText={errors.locatorValue}
-                />
-            </Stack>
-            <Stack direction='row' gap='10px'>
-                <TextField
-                    autoFocus
-                    required
-                    margin="dense"
-                    id="locatorType2"
-                    name="locatorType2"
-                    label="Locator-Type 2"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={formData.locatorType2}
-                    onChange={handleInputChange}
-                    error={!!errors.locatorType2}
-                    helperText={errors.locatorType2}
-                />
-                <TextField
-                    autoFocus
-                    required
-                    margin="dense"
-                    id="locatorValue2"
-                    name="locatorValue2"
-                    label="Locator-Value 2"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={formData.locatorValue2}
-                    onChange={handleInputChange}
-                    error={!!errors.locatorValue2}
-                    helperText={errors.locatorValue2}
-                />
+                <FormControl fullWidth variant="standard" margin="dense" error={!!errors.locatorId}>
+                    <InputLabel id="locatorId-label">Locator</InputLabel>
+                    <Select
+                        labelId="locatorId-label"
+                        id="locatorId"
+                        name="locatorId"
+                        value={JSON.stringify(formData.locatorId)}
+                        onChange={handleInputChange}
+                    >
+                        {locatorOptions.map((locator) => (
+                            <MenuItem key={locator.locatorId} value={JSON.stringify(locator)}>
+                                {locator.locatorName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {errors.locatorId && <Typography color="error">{errors.locatorId}</Typography>}
+                </FormControl>
+                <Button variant='outlined' sx={{ height: '55px' }} onClick={handleAddNewLocator}>ADD NEW</Button>
             </Stack>
             <TextField
                 autoFocus
@@ -323,8 +292,19 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                     variant='contained'
                     onClick={handleSaveOperation}
                 >
-                    {subTestData ? 'Update' : 'Add'}
+                    Add
                 </Button>
+            </Box>
+
+            <Box>
+                {showAddLocatorDialog && (
+                    <AddLocatorDialog
+                        locatorOptions={locatorOptions}
+                        setLocatorOptions={setLocatorOptions}
+                        selectedTest={selectedTest}
+                        onClose={handleCloseLocatorDialog}
+                    />
+                )}
             </Box>
         </Box>
     )

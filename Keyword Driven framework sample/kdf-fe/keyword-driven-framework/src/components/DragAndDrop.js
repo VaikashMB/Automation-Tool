@@ -46,11 +46,8 @@ const DragAndDrop = () => {
             keyword: data.keyword,
             orderOfExecution: data.orderOfExecution,
             description: data.description,
-            locatorType: data.locatorType,
-            locatorValue: data.locatorValue,
             value: data.value,
-            locatorType2: data.locatorType2,
-            locatorValue2: data.locatorValue2,
+            locatorId: data.locatorId ? data.locatorId.locatorId : null,
             flag: data.flag,
             screenshot: data.screenshot ? true : false,
         }
@@ -125,7 +122,7 @@ const DragAndDrop = () => {
     const handleAddSubTest = (subTest = null) => {
         if (subTest === null) {
             const newOrderOfExecution = subTests.length + 1;
-            subTest = { id: null, orderOfExecution: newOrderOfExecution, description: '',locatorType: '',locatorValue: '',locatorType2:'',locatorValue2:'',value: '', flag: 'Y' };
+            subTest = { id: null, orderOfExecution: newOrderOfExecution, description: '', locatorType: '', value: '', flag: 'Y' };
         }
         setSelectedSubTest(subTest);
         setShowAddSubTestForm(true);
@@ -151,7 +148,7 @@ const DragAndDrop = () => {
 
         const updatedOrder = reorderedSubTests.map((subTest, index) => ({
             ...subTest,
-            orderOfExecution: index + 1 // Assuming order starts from 1
+            orderOfExecution: index + 1
         }));
 
         // Send updated order to the backend

@@ -1,9 +1,11 @@
 package com.keyworddrivenframework.sample1.Service;
 
 import com.keyworddrivenframework.sample1.Entity.ActionKeywords;
+import com.keyworddrivenframework.sample1.Entity.Locator;
 import com.keyworddrivenframework.sample1.Entity.Test;
 import com.keyworddrivenframework.sample1.Entity.TestResults;
 import com.keyworddrivenframework.sample1.Repository.KeywordRepository;
+import com.keyworddrivenframework.sample1.Repository.LocatorRepository;
 import com.keyworddrivenframework.sample1.Repository.TestRepository;
 import com.keyworddrivenframework.sample1.Utils.TestExecutor;
 import lombok.Getter;
@@ -30,6 +32,9 @@ public class KeywordService {
 
     @Autowired
     private TestRepository testRepository;
+
+    @Autowired
+    private LocatorRepository locatorRepository;
 
     public List<ActionKeywords> getActionKeywordsByTestId(Test testId) {
         return keywordRepository.findByTestId(testId);
@@ -78,13 +83,15 @@ public class KeywordService {
         TestExecutor testExecutor = testExecutorThreadLocal.get();
 
         String keyword = actionKeywords.get("keyword");
-        String locatorType = actionKeywords.get("locatorType");
-        String locatorValue = actionKeywords.get("locatorValue");
-        String locatorType2 = actionKeywords.get("locatorType2");
-        String locatorValue2 = actionKeywords.get("locatorValue2");
         String value = actionKeywords.get("value");
         String description = actionKeywords.get("description");
         boolean screenshotValue = Boolean.parseBoolean(actionKeywords.get("screenshot"));
+        int locatorId = Integer.parseInt(actionKeywords.get("locatorId"));
+        Locator locator = locatorRepository.findById(locatorId).orElseThrow(() -> new RuntimeException("Locator not found"));
+        String locatorType = locator.getLocatorType1();
+        String locatorValue = locator.getLocatorValue1();
+        String locatorType2 = locator.getLocatorType2();
+        String locatorValue2 = locator.getLocatorValue2();
 
         TestResults testResult = new TestResults();
         testResult.setDescription(description);

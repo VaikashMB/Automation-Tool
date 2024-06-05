@@ -970,7 +970,7 @@ public class TestExecutor {
             TakesScreenshot screenshot = (TakesScreenshot) driver;
             File srcFile = screenshot.getScreenshotAs(OutputType.FILE);
             String filename = System.currentTimeMillis() + ".png";
-            String filePath = "/home/vaikashmb/Documents/PracticeWorks/Keyword Driven framework sample/kdf-fe/keyword-driven-framework/public/screenshots/" + filename;
+            String filePath = "/home/vaikashmb/Documents/PracticeWorks/Automation-Tool/Keyword Driven framework sample/kdf-fe/keyword-driven-framework/public/screenshots/" + filename;
             File destFile = new File(filePath);
             Files.copy(srcFile.toPath(), destFile.toPath());
             System.out.println("Screenshot captured and saved to: " + filePath);

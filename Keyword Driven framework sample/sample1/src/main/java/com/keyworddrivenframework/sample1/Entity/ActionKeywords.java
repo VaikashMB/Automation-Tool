@@ -18,15 +18,15 @@ public class ActionKeywords {
     private float orderOfExecution;
     private String keyword;
     private String description;
-    private String locatorType;
-    private String locatorValue;
     private String value;
-    private String locatorType2;
-    private String locatorValue2;
     private String flag;
     private boolean screenshot;
 
     @ManyToOne
     @JoinColumn(name = "testId",referencedColumnName = "testId")
     private Test testId;
+
+    @ManyToOne
+    @JoinColumn(name = "locatorId",referencedColumnName = "locatorId")
+    private Locator locatorId;
 }
