@@ -32,6 +32,15 @@ const Elements = () => {
         setNoResults(searchResults.length === 0)
     };
 
+    const handleClearSearch = (selectedTest) => {
+        setNoResults(false);
+        if (selectedTest) {
+            fetchLocatorsUnderTestId(selectedTest);
+        } else {
+            fetchLocators();
+        }
+    };
+
     useEffect(() => {
         fetchLocators()
     }, [])
@@ -163,7 +172,7 @@ const Elements = () => {
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography sx={{ padding: '20px' }} variant='h4'>ADDED ELEMENTS</Typography>
-                <LocatorSearch onSearch={handleSearch} />
+                <LocatorSearch onSearch={handleSearch} selectedTest={selectedTest} onClearSearch={handleClearSearch} />
             </Box>
 
             <Box sx={{ width: '55%', display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px' }}>
@@ -268,21 +277,6 @@ const Elements = () => {
                                                 </IconButton>
                                             </Box>
                                         </Box>
-                                        {/* <Typography variant="body2" color="text.secondary">
-                                        Locator Type1: {locator.locatorType1}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Locator Value1: {locator.locatorValue1}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Locator Type2: {locator.locatorType2}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Locator Value2: {locator.locatorValue2}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Test Name: {locator.testId.testName}
-                                    </Typography> */}
                                     </CardContent>
                                 </Card>
                             </Grid>

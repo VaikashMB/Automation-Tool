@@ -57,4 +57,8 @@ public class LocatorService {
     public List<Locator> searchLocators(String query) {
         return locatorRepository.findByLocatorNameContainingIgnoreCase(query);
     }
+
+    public List<Locator> searchLocators(Test testId,String query) {
+        return locatorRepository.findByTestIdAndLocatorNameContainingIgnoreCase(testId,query);
+    }
 }

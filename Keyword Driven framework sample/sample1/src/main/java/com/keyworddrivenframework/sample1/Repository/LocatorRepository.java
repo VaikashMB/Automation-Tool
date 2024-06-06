@@ -12,4 +12,5 @@ import java.util.List;
 public interface LocatorRepository extends JpaRepository<Locator, Integer> {
     List<Locator> findByTestId(Test testId);
     List<Locator> findByLocatorNameContainingIgnoreCase(String query);
+    List<Locator> findByTestIdAndLocatorNameContainingIgnoreCase(Test testId, String query);
 }

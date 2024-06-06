@@ -50,4 +50,9 @@ public class LocatorController {
     public List<Locator> searchLocators(@PathVariable String query) {
         return locatorService.searchLocators(query);
     }
+
+    @GetMapping("/searchLocators/{testId}/{query}")
+    public List<Locator> searchLocators(@PathVariable Test testId,@PathVariable String query) {
+        return locatorService.searchLocators(testId,query);
+    }
 }

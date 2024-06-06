@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Box, IconButton, InputAdornment } from '@mui/material';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 
-const LocatorSearch = ({ onSearch }) => {
+const LocatorSearch = ({ onSearch, selectedTest, onClearSearch }) => {
 
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = () => {
-        axios.get(`http://localhost:8081/searchLocators/${searchQuery}`)
+        const url = selectedTest
+            ? `http://localhost:8081/searchLocators/${selectedTest}/${searchQuery}`
+            : `http://localhost:8081/searchLocators/${searchQuery}`;
+        axios.get(url)
             .then((response) => {
                 onSearch(response.data);
             })
@@ -17,19 +21,40 @@ const LocatorSearch = ({ onSearch }) => {
             });
     };
 
+    const handleClearSearch = () => {
+        setSearchQuery('');
+        onClearSearch(selectedTest);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     return (
         <Box sx={{ display: 'flex', marginRight: '20px' }}>
             <TextField
-                type='search'
                 id='search'
                 label="Search Locator Name"
                 variant="outlined"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton color='primary' onClick={handleClearSearch}>
+                                <ClearIcon />
+                            </IconButton>
+                            <IconButton color='primary' onClick={handleSearch}>
+                                <SearchIcon />
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                }}
+                sx={{ flexGrow: 1 }}
+                onKeyDown={handleKeyDown}
             />
-            <Button sx={{ height: '54px', marginLeft: '3px' }} variant="contained" onClick={handleSearch}>
-                <SearchIcon />
-            </Button>
         </Box>
     );
 };
