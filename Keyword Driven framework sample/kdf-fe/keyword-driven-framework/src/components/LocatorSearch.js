@@ -5,9 +5,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 
 const LocatorSearch = ({ onSearch, selectedTest, onClearSearch }) => {
-
+    //statevariable and function to store the search query and to set the search query.
     const [searchQuery, setSearchQuery] = useState('');
-
+    //function to search for a particular locator. (If the search is happening under a selected test , use the first api, if no test is selected and the search is happening , use the second api)
     const handleSearch = () => {
         const url = selectedTest
             ? `http://localhost:8081/searchLocators/${selectedTest}/${searchQuery}`
@@ -20,12 +20,12 @@ const LocatorSearch = ({ onSearch, selectedTest, onClearSearch }) => {
                 console.error('Error searching locators:', error);
             });
     };
-
+    //function to clear the search field
     const handleClearSearch = () => {
         setSearchQuery('');
         onClearSearch(selectedTest);
     };
-
+    //function to search on pressing the Enter key.
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             handleSearch();

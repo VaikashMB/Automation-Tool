@@ -1,7 +1,6 @@
 package com.keyworddrivenframework.sample1.Service;
 
 import com.keyworddrivenframework.sample1.Entity.Locator;
-import com.keyworddrivenframework.sample1.Entity.Project;
 import com.keyworddrivenframework.sample1.Entity.Test;
 import com.keyworddrivenframework.sample1.Repository.LocatorRepository;
 import org.springframework.stereotype.Service;

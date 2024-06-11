@@ -15,7 +15,6 @@ public class TestResults {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
     private String description;
     private String result;
     private String screenshotLink;

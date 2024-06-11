@@ -25,7 +25,4 @@ public class Test  {
     @JoinColumn(name = "moduleId",referencedColumnName = "moduleId")
     private Module moduleId;
 
-
-
-
 }

@@ -1,7 +1,6 @@
 package com.keyworddrivenframework.sample1.Repository;
 
 import com.keyworddrivenframework.sample1.Entity.Locator;
-import com.keyworddrivenframework.sample1.Entity.Project;
 import com.keyworddrivenframework.sample1.Entity.Test;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

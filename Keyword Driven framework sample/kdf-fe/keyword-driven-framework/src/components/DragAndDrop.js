@@ -21,11 +21,13 @@ const DragAndDrop = () => {
     const [showAddSubTestForm, setShowAddSubTestForm] = useState(false);
     const [selectedSubTest, setSelectedSubTest] = useState(null);
     const [isCardsVisible, setIsCardsVisible] = useState(false);
+    const [disabledModule, setDisabledModule] = useState(true)
+    const [disabledTest, setDisabledTest] = useState(true)
 
     useEffect(() => {
         console.log(isChecked);
     }, [isChecked]);
-
+    //function for handling the browser selection
     const handleBrowserCheckboxChange = (browser, event) => {
         const isChecked = event.target.checked;
         if (isChecked) {
@@ -52,7 +54,7 @@ const DragAndDrop = () => {
             screenshot: data.screenshot ? true : false,
         }
     });
-
+    //function for executing the keywords under the selected test and post the test results
     const handleExecution = () => {
         const payload = {
             browsers: selectedBrowsers,
@@ -74,51 +76,53 @@ const DragAndDrop = () => {
                 console.error("Error executing all keywords:", error);
             });
     };
-
+    //function for fetching the projects
     const fetchProjects = () => {
         axios.get("http://localhost:8081/allProjects")
             .then((response) => setProjects(response.data))
             .catch((error) => console.log(error))
     }
-
+    //function for fetching the modules under the selected project
     const fetchModulesUnderProject = (projectId) => {
         axios.get(`http://localhost:8081/project/modules/${projectId}`)
             .then((response) => setModules(response.data))
             .catch((error) => console.log(error))
     }
-
+    //to store the selected project into a state variable
     const handleProjectChange = (event) => {
         const projectId = event.target.value;
         setSelectedProject(projectId);
         fetchModulesUnderProject(projectId);
         setShowAddSubTestForm(false);
+        setDisabledModule(false)
     };
-
+    //function to fetch tests under the selected module
     const fetchTestsUnderModule = (moduleId) => {
         axios.get(`http://localhost:8081/tests/${moduleId}`)
             .then((response) => setTests(response.data))
             .catch((error) => console.log(error))
     }
-
+    //to store the selected module into a state variable.
     const handleModuleChange = (event) => {
         const moduleId = event.target.value;
         setSelectedModule(moduleId);
         fetchTestsUnderModule(moduleId);
         setShowAddSubTestForm(false);
+        setDisabledTest(false)
     }
-
+    //function to fetch data under the selected test.
     const fetchDataUnderTest = (testId) => {
         axios.get(`http://localhost:8081/keyword/subTests/${testId}`)
             .then((response) => setSubTests(response.data))
             .catch((error) => console.log(error))
     }
-
+    //to store the selected test into a state variable
     const handleTestChange = (event) => {
         const testId = event.target.value;
         setSelectedTest(testId);
         fetchDataUnderTest(testId);
     }
-
+    //function to handle the subtest adding form. If the subTest is null, the form appears with the next order of execution. If not null, the form appears with the saved data.
     const handleAddSubTest = (subTest = null) => {
         if (subTest === null) {
             const newOrderOfExecution = subTests.length + 1;
@@ -127,12 +131,12 @@ const DragAndDrop = () => {
         setSelectedSubTest(subTest);
         setShowAddSubTestForm(true);
     };
-
+    //function to close the form for adding a subtest
     const handleCloseAddSubTestForm = () => {
         setShowAddSubTestForm(false);
         setSelectedSubTest(null);
     };
-
+    //drag and drop the cards.
     const onDragEnd = (result) => {
         const { destination, source } = result;
 
@@ -247,6 +251,7 @@ const DragAndDrop = () => {
                         <FormControl sx={{ width: '180px' }}>
                             <InputLabel id="module-selection">Module</InputLabel>
                             <Select
+                                disabled={disabledModule}
                                 labelId="module-selection"
                                 id="select-module"
                                 value={selectedModule}
@@ -270,6 +275,7 @@ const DragAndDrop = () => {
                         <FormControl sx={{ width: '180px' }}>
                             <InputLabel id="test-selection">Test</InputLabel>
                             <Select
+                                disabled={disabledTest}
                                 labelId="test-selection"
                                 id="select-test"
                                 label="test"

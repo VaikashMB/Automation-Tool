@@ -1,7 +1,6 @@
 import { Box, Tab } from '@mui/material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import React, { useState } from 'react'
-import TestsComponent from './TestsComponent'
 import DragAndDrop from './DragAndDrop'
 import Elements from './Elements'
 
@@ -24,7 +23,6 @@ const Tabs1 = () => {
                         <Tab label='Jobs' value='3'></Tab>
                         <Tab label='Data Sources' value='4'></Tab>
                         <Tab label='Parameters' value='5'></Tab>
-                        <Tab label='Testing Tab' value='6'></Tab>
                     </TabList>
                 </Box>
                 <TabPanel value='1'><DragAndDrop /></TabPanel>
@@ -32,7 +30,6 @@ const Tabs1 = () => {
                 <TabPanel value='3'>3</TabPanel>
                 <TabPanel value='4'>4</TabPanel>
                 <TabPanel value='5'>5</TabPanel>
-                <TabPanel value='6'><TestsComponent /></TabPanel>
             </TabContext>
         </Box>
     )

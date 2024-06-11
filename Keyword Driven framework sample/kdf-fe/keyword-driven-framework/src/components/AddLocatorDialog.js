@@ -12,13 +12,13 @@ const AddLocatorDialog = ({ selectedTest, setLocatorOptions, locatorOptions, onC
         locatorType2: '',
         locatorValue2: '',
     })
-
+    //if an existing locator is selected, set the form with the locator data as the saved data.
     useEffect(() => {
         if (existingLocator) {
             setNewLocator(existingLocator)
         }
     }, [existingLocator])
-
+    //function to cahnge the value of each fields in the form.
     const handleChange = (e) => {
         const { name, value } = e.target
         setNewLocator({
@@ -26,7 +26,7 @@ const AddLocatorDialog = ({ selectedTest, setLocatorOptions, locatorOptions, onC
             [name]: value
         })
     }
-
+    //function to add a new locator or edit an existing locator on click of submit button.
     const handleSubmit = () => {
         if (existingLocator) {
             axios.put(`http://localhost:8081/updateLocator/${existingLocator.locatorId}`, newLocator)

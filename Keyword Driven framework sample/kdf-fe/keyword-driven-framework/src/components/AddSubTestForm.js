@@ -4,8 +4,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
 import AddLocatorDialog from './AddLocatorDialog';
 
-const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests, subTestData, subTestsLength}) => {
-
+const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests, subTestData, subTestsLength }) => {
     const [showAddLocatorDialog, setShowAddLocatorDialog] = useState(false)
     const [errors, setErrors] = useState({})
     const [locatorOptions, setLocatorOptions] = useState([]);
@@ -18,43 +17,17 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
         flag: '',
         screenshot: false
     })
-
+    //array for storing all keywords.
     const keywords = [
-        'goToURL',
-        'typeText',
-        'verifyText',
-        'click',
-        'closeBrowser',
-        'waitFor',
-        'clearText',
-        'verifyElement',
-        'selectFromDropdown',
-        'typeMaskedText',
-        'mouseHover',
-        'doubleClick',
-        'downKeyAndEnter',
-        'scrollToBottom',
-        'scrollToTop',
-        'scrollToElement',
-        'getValue',
-        'typeValue',
-        'enter',
-        'verifyURL',
-        'verifyPageTitle',
-        'waitForElement',
-        'generateRandomNumber',
-        'generateRandomText',
-        'refreshPage',
-        'acceptAlert',
-        'dismissAlert',
-        'fileUpload',
-        'dragAndDrop',
-        'executeSelectQuery',
-        'rightClick'
-    ]
+        'goToURL', 'typeText', 'verifyText', 'click', 'closeBrowser', 'waitFor', 'clearText', 'verifyElement',
+        'selectFromDropdown', 'typeMaskedText', 'mouseHover', 'doubleClick', 'downKeyAndEnter', 'scrollToBottom',
+        'scrollToTop', 'scrollToElement', 'getValue', 'typeValue', 'enter', 'verifyURL', 'verifyPageTitle',
+        'waitForElement', 'generateRandomNumber', 'generateRandomText', 'refreshPage', 'acceptAlert', 'dismissAlert',
+        'fileUpload', 'dragAndDrop', 'executeSelectQuery', 'rightClick'
+    ];
 
     const flags = ["Y", "N"]
-
+    //form validation
     const validate = () => {
         let tempErrors = {};
         if (!formData.keyword) tempErrors.keyword = "Keyword is required";
@@ -68,6 +41,7 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
     };
 
     useEffect(() => {
+        //Under a selected test, the locators under that particular test will displayed in the dropdown.
         if (selectedTest) {
             axios.get(`http://localhost:8081/getLocatorsUnderTestId/${selectedTest}`)
                 .then(response => {
@@ -77,9 +51,11 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                     console.log(error);
                 });
         }
+        //if an existing subtest is selected, the form is set with the saved data.
         if (subTestData) {
             setFormData(subTestData);
         } else {
+            //else, the form is set with only the order of execution which is one more than the already available subtests length.
             setFormData((prevData) => ({
                 ...prevData,
                 orderOfExecution: subTestsLength + 1
@@ -94,18 +70,18 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
             [name]: name === 'locatorId' ? JSON.parse(value) : value
         }));
     };
-
+    //the component mounts when the provided field changes
     useEffect(() => {
         console.log("Screenshot state:", formData.screenshot);
     }, [formData.screenshot]);
-
+    //function for checking and unchecking the screenshot checkbox
     const handleCheckboxChange = (event) => {
         setFormData((prevData) => ({
             ...prevData,
             screenshot: event.target.checked
         }));
     };
-
+    //function for posting the subtestdata under the selected test only if the validation is satisfied.
     const handleSaveOperation = () => {
         if (validate()) {
             axios.post(`http://localhost:8081/keyword/addSubTest/${selectedTest}`, formData)
@@ -120,8 +96,7 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                 });
         }
     }
-
-    //commented temporarily....
+    //function for deleting the existing subtests. 
     const handleDeleteOperation = () => {
         axios.delete(`http://localhost:8081/keyword/delete/${subTestData.id}`)
             .then((response) => {
@@ -135,7 +110,7 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                 console.log(error);
             });
     };
-
+    //when add new  is clicked, the locator adding form should be displayed.
     const handleAddNewLocator = () => {
         setShowAddLocatorDialog(true)
     }
