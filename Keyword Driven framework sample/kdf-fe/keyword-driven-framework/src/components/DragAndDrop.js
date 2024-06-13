@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography, Card, CardContent } from '@mui/material';
+import { Box } from '@mui/material';
 import axios from 'axios';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import AddModuleDialog from './AddModuleDialog';
-import AddProjectDialog from './AddProjectDialog';
-import AddTestDialog from './AddTestDialog';
-import { FaChrome, FaEdge } from 'react-icons/fa';
 import AddSubTestForm from './AddSubTestForm';
+import Browsers from './Browsers';
+import ProjectSelect from './ProjectSelect';
+import ModuleSelect from './ModuleSelect';
+import TestSelect from './TestSelect';
+import AddProjectDialog from './AddProjectDialog';
+import AddModuleDialog from './AddModuleDialog';
+import AddTestDialog from './AddTestDialog'
+import SubTests from './SubTests';
 
 const DragAndDrop = () => {
     const [projects, setProjects] = useState([]);
@@ -27,19 +30,8 @@ const DragAndDrop = () => {
     useEffect(() => {
         console.log(isChecked);
     }, [isChecked]);
-    //function for handling the browser selection
-    const handleBrowserCheckboxChange = (browser, event) => {
-        const isChecked = event.target.checked;
-        if (isChecked) {
-            setSelectedBrowsers(prevState => [...prevState, browser]);
-            console.log(selectedBrowsers)
-        } else {
-            setSelectedBrowsers(prevState => prevState.filter(item => item !== browser));
-        }
-    };
 
     useEffect(() => {
-        console.log(selectedBrowsers);
     }, [selectedBrowsers]);
 
     const rows = subTests.map((data) => {
@@ -200,10 +192,6 @@ const DragAndDrop = () => {
         setSubTests([]);
     }, [selectedTest]);
 
-    const refreshProjects = () => {
-        fetchProjects();
-    };
-
     const refreshModules = () => {
         if (selectedProject) {
             fetchModulesUnderProject(selectedProject);
@@ -220,247 +208,45 @@ const DragAndDrop = () => {
         <Box sx={{ display: 'flex', gap: '50px' }}>
             <Box sx={{ width: '55%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {/* ...dropdowns... */}
-                <Box sx={{ width: '20%', paddingRight: '10px', display: 'flex', gap: 4 }}>
-                    <Box id='projectSelect' sx={{ display: "flex" }}>
-                        <AddProjectDialog onProjectAdded={refreshProjects} />
-                        <FormControl sx={{ width: '180px' }}>
-                            <InputLabel id="project-selection">Project</InputLabel>
-                            <Select
-                                labelId="project-selection"
-                                id="select-project"
-                                value={selectedProject}
-                                label="project"
-                                onChange={handleProjectChange}
-                                type='text'
-                                onFocus={fetchProjects}
-                            >
-                                {projects.map((project) => (
-                                    <MenuItem
-                                        key={project.projectId}
-                                        value={project.projectId}
-                                    >
-                                        {project.projectName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <Box id='moduleSelect' sx={{ display: 'flex' }}>
-                        <AddModuleDialog selectedProject={selectedProject} onModuleAdded={refreshModules} />
-                        <FormControl sx={{ width: '180px' }}>
-                            <InputLabel id="module-selection">Module</InputLabel>
-                            <Select
-                                disabled={disabledModule}
-                                labelId="module-selection"
-                                id="select-module"
-                                value={selectedModule}
-                                label="module"
-                                onChange={handleModuleChange}
-                            >
-                                {modules.map((module) => (
-                                    <MenuItem
-                                        key={module.moduleId}
-                                        value={module.moduleId}
-                                    >
-                                        {module.moduleName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <Box id='testSelect' sx={{ display: 'flex' }}>
-                        <AddTestDialog selectedModule={selectedModule} onTestAdded={refreshTests} />
-                        <FormControl sx={{ width: '180px' }}>
-                            <InputLabel id="test-selection">Test</InputLabel>
-                            <Select
-                                disabled={disabledTest}
-                                labelId="test-selection"
-                                id="select-test"
-                                label="test"
-                                value={selectedTest}
-                                onChange={handleTestChange}
-                            >
-                                {tests.map((test) => (
-                                    <MenuItem
-                                        key={test.testId}
-                                        value={test.testId}
-                                    >
-                                        {test.testName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                <Box sx={{ width: '20%', paddingRight: '10px', display: 'flex', gap: 2 }}>
+                    <AddProjectDialog onProjectAdded={fetchProjects} />
+                    <ProjectSelect
+                        projects={projects}
+                        selectedProject={selectedProject}
+                        handleProjectChange={handleProjectChange}
+                        fetchProjects={fetchProjects}
+                    />
+                    <AddModuleDialog selectedProject={selectedProject} onModuleAdded={refreshModules} />
+                    <ModuleSelect
+                        modules={modules}
+                        selectedModule={selectedModule}
+                        handleModuleChange={handleModuleChange}
+                        disabledModule={disabledModule}
+                        selectedProject={selectedProject}
+                        refreshModules={refreshModules}
+                    />
+                    <AddTestDialog selectedModule={selectedModule} onTestAdded={refreshTests} />
+                    <TestSelect
+                        tests={tests}
+                        selectedTest={selectedTest}
+                        handleTestChange={handleTestChange}
+                        disabledTest={disabledTest}
+                        selectedModule={selectedModule}
+                        refreshTests={refreshTests}
+                    />
                 </Box>
 
                 {/* ...browsers... */}
-                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '20px', marginTop: '20px', justifyContent: 'start', gap: '62px' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div>
-                            <img src='https://img.icons8.com/?size=100&id=ejub91zEY6Sl&format=png&color=000000' alt='chrome-icon' style={{ width: '22px', height: '22px' }}></img>
-                        </div>
-                        <label htmlFor="chromeCheckbox" style={{ fontSize: '16px', marginBottom: 0 }}>Chrome</label>
-                        <input
-                            id='chromeCheckbox'
-                            type="checkbox"
-                            color="primary"
-                            style={{ width: '24px', height: '24px' }}
-                            onChange={(event) => handleBrowserCheckboxChange('chrome', event)}
-                        />
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div>
-                            <img src='https://img.icons8.com/?size=100&id=dGm9KIZPpukc&format=png&color=000000' alt='edge-icon' style={{ width: '22px', height: '22px' }}></img>
-                        </div>
-                        <label htmlFor="edgeCheckbox" style={{ fontSize: '16px', marginBottom: 0 }}>Edge</label>
-                        <input
-                            id='edgeCheckbox'
-                            type="checkbox"
-                            color="primary"
-                            style={{ width: '24px', height: '24px' }}
-                            onChange={(event) => handleBrowserCheckboxChange('edge', event)}
-                        />
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div><FaChrome /></div>
-                        <label htmlFor="chromeHeadlessCheckbox" style={{ fontSize: '16px', marginBottom: 0 }}>Chrome-Headless</label>
-                        <input
-                            id='chromeHeadlessCheckbox'
-                            type="checkbox"
-                            color="primary"
-                            style={{ width: '24px', height: '24px' }}
-                            onChange={(event) => handleBrowserCheckboxChange('chrome-headless', event)}
-                        />
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div><FaEdge /></div>
-                        <label htmlFor="edgeHeadlessCheckbox" style={{ fontSize: '16px', marginBottom: 0 }}>Edge-Headless</label>
-                        <input
-                            id='edgeHeadlessCheckbox'
-                            type="checkbox"
-                            color="primary"
-                            style={{ width: '24px', height: '24px' }}
-                            onChange={(event) => handleBrowserCheckboxChange('edge-headless', event)}
-                        />
-                    </Box>
-                </Box>
+                <Browsers setSelectedBrowsers={setSelectedBrowsers} />
 
                 {/* ...cards, add and execute... */}
                 {isCardsVisible && (
-                    <Box>
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <Droppable droppableId={subTests}>
-                                {(provided) => (
-                                    <Box
-                                        {...provided.droppableProps}
-                                        ref={provided.innerRef}
-                                        sx={{
-                                            maxHeight: '395px',
-                                            overflowY: 'auto',
-                                            border: '0px solid #ccc',
-                                            borderRadius: '8px',
-                                            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                                            padding: 1
-                                        }}
-                                    >
-                                        {subTests.map((subTest, index) => (
-                                            <Draggable key={subTest.id} draggableId={String(subTest.id)} index={index}>
-                                                {(provided) => (
-                                                    <Card
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        variant="outlined"
-                                                        sx={{
-                                                            marginBottom: '10px',
-                                                            height: '40px',
-                                                            width: '800px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            padding: 1,
-                                                            cursor: 'pointer',
-                                                            backgroundColor: subTest.flag === 'N' ? '#f0f0f0' : '#ffffff',
-                                                            borderRadius: 1,
-                                                            transition: 'transform 0.2s',
-                                                            '&:hover': {
-                                                                transform: 'scale(1.02)',
-                                                            },
-                                                            opacity: subTest.flag === 'N' ? 0.5 : 1,
-                                                        }}
-                                                        onClick={() => handleAddSubTest(subTest)}
-                                                    >
-                                                        <CardContent
-                                                            sx={{
-                                                                padding: '0 !important',
-                                                                width: '100%',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                            }}
-                                                        >
-                                                            <Typography variant="body1" sx={{ textAlign: 'start', width: '100%' }}>
-                                                                {subTest.orderOfExecution} - {subTest.description}
-                                                            </Typography>
-                                                        </CardContent>
-                                                    </Card>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </Box>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
-
-                        <Card
-                            variant="outlined"
-                            sx={{
-                                marginTop: 1,
-                                marginBottom: 2,
-                                height: '40px',
-                                width: '810px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                backgroundColor: '#e0e0e0',
-                                transition: 'background-color 0.2s, transform 0.2s',
-                                '&:hover': {
-                                    backgroundColor: '#d0d0d0',
-                                    transform: 'scale(1.02)',
-                                },
-                            }}
-                            onClick={() => handleAddSubTest(null)}
-                        >
-                            <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" component="div">
-                                    <strong>+Add</strong>
-                                </Typography>
-                            </CardContent>
-                        </Card>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                            <Button
-                                type='button'
-                                id='runBtn'
-                                variant='contained'
-                                onClick={handleExecution}
-                                color='success'
-                                sx={{
-                                    padding: '10px 20px',
-                                    fontSize: '16px',
-                                    fontWeight: 'bold',
-                                    transition: 'background-color 0.3s',
-                                    '&:hover': {
-                                        backgroundColor: '#388e3c',
-                                    },
-                                }}
-                            >
-                                EXECUTE
-                            </Button>
-                        </Box>
-                    </Box>
+                    <SubTests
+                        subTests={subTests}
+                        handleAddSubTest={handleAddSubTest}
+                        handleExecution={handleExecution}
+                        onDragEnd={onDragEnd}
+                    />
                 )}
             </Box>
 

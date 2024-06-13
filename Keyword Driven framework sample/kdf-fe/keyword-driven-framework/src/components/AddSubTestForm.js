@@ -72,7 +72,6 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
     };
     //the component mounts when the provided field changes
     useEffect(() => {
-        console.log("Screenshot state:", formData.screenshot);
     }, [formData.screenshot]);
     //function for checking and unchecking the screenshot checkbox
     const handleCheckboxChange = (event) => {

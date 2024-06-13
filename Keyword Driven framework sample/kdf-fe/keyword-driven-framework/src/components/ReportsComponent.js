@@ -1,8 +1,12 @@
-import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Box } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react'
 import ResultComponent from './ResultComponent';
 import Typography from '@mui/material/Typography';
+import ProjectSelect from './ProjectSelect';
+import ModuleSelect from './ModuleSelect';
+import TestSelect from './TestSelect';
+import ExecutionsSelect from './ExecutionsSelect';
 
 
 const ReportsComponent = () => {
@@ -25,6 +29,10 @@ const ReportsComponent = () => {
     //statevariable which stores the test results under a particular runId.
     const [testResultsByRunId, setTestResultsByRunId] = useState([])
 
+    const [disabledModule, setDisabledModule] = useState(true)
+    const [disabledTest, setDisabledTest] = useState(true)
+    const [disabledExecutions, setDisabledExecutions] = useState(true)
+
 
     //function for fetching all the projects available and setting it to the state variable "projects".
     const fetchProjects = () => {
@@ -43,6 +51,7 @@ const ReportsComponent = () => {
         const projectId = event.target.value
         setSelectedProject(projectId)
         fetchModulesUnderProject(projectId)
+        setDisabledModule(false)
     }
     //function for fetching all the tests available under a module and adding them to the state variable "tests".
     const fetchTestsUnderModule = (moduleId) => {
@@ -55,6 +64,7 @@ const ReportsComponent = () => {
         const moduleId = event.target.value
         setSelectedModule(moduleId)
         fetchTestsUnderModule(moduleId)
+        setDisabledTest(false)
     }
     //function for fetching TestResults by TestId and setting it to the state variable "testResults".Also filtering the TestResults by runId so that the RunId is not repeated while selecting from dropdown.
     const fetchTestResultsUnderTest = (testId) => {
@@ -75,6 +85,7 @@ const ReportsComponent = () => {
         const testId = event.target.value
         setSelectedTest(testId)
         fetchTestResultsUnderTest(testId)
+        setDisabledExecutions(false)
     }
     //fetching TestResults by RunId and setting it to the state variable "testResultsByRunId".
     const fetchTestResultsByRunId = (runId) => {
@@ -88,18 +99,7 @@ const ReportsComponent = () => {
         setSelectedExecution(runId)
         fetchTestResultsByRunId(runId)
     }
-    //function responsible for displaying the particular element by adding or removing the 'hidden' class.
-    const handleModule = () => {
-        document.getElementById("moduleSelect2").classList.remove("hidden")
-    }
-    //function responsible for displaying the particular element by adding or removing the 'hidden' class.
-    const handleTest = () => {
-        document.getElementById("testSelect2").classList.remove("hidden")
-    }
-    //function responsible for displaying the particular element by adding or removing the 'hidden' class.
-    const handleRunTimes = () => {
-        document.getElementById("executionSelect").classList.remove("hidden")
-    }
+
     //function responsible for displaying the particular element by adding or removing the 'hidden' class.
     const handleResultsDatagrid = () => {
         document.getElementById("datagridSelect2").classList.remove("hidden")
@@ -117,114 +117,40 @@ const ReportsComponent = () => {
             {/* ....container having the dropdowns and the datagrid.... */}
             <Box sx={{ width: '100%', display: 'flex', gap: 3 }}>
                 {/* ....container having the dropdowns.... */}
-                <Box sx={{ width: '20%', paddingLeft: '20px', paddingRight: '70px', display: 'flex', flexDirection: 'column', gap: 3 }} >
-                    {/* ...project dropdown...*/}
-                    <Box id='projectSelect2' sx={{ display: "flex" }} >
-                        <FormControl fullWidth>
-                            <InputLabel id="project-selection">Project</InputLabel>
-                            <Select
-                                labelId="project-selection"
-                                id="select-project"
-                                value={selectedProject}
-                                label="project"
-                                onChange={handleProjectChange}
-                                type='text'
-                                onFocus={fetchProjects}
-                            >
-                                {projects.map((project) => (
-                                    <MenuItem
-                                        key={project.projectId}
-                                        value={project.projectId}
-                                        onClick={handleModule}
-                                    >
-                                        {project.projectName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                <Box sx={{ width: '20%', paddingLeft: '20px', paddingRight: '70px', display: 'flex', flexDirection: 'column', gap: 5 }} >
 
-                    {/* ...module dropdown...*/}
-                    <div id='moduleSelect2' className="hidden">
-                        <Box sx={{ display: 'flex' }}>
-                            <FormControl fullWidth>
-                                <InputLabel id="module-selection">Module</InputLabel>
-                                <Select
-                                    labelId="module-selection"
-                                    id="select-module"
-                                    value={selectedModule}
-                                    label="module"
-                                    onChange={handleModuleChange}
-                                >
-                                    {modules.map((module) => (
-                                        <MenuItem
-                                            key={module.moduleId}
-                                            value={module.moduleId}
-                                            onClick={handleTest}
-                                        >
-                                            {module.moduleName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </div>
+                    <ProjectSelect
+                        projects={projects}
+                        selectedProject={selectedProject}
+                        handleProjectChange={handleProjectChange}
+                        fetchProjects={fetchProjects}
+                    />
 
-                    {/* ...test dropdown...*/}
-                    <div id='testSelect2' className='hidden'>
-                        <Box sx={{ display: 'flex' }}>
-                            <FormControl fullWidth>
-                                <InputLabel id="test-selection">Test</InputLabel>
-                                <Select
-                                    labelId="test-selection"
-                                    id="select-test"
-                                    label="test"
-                                    value={selectedTest}
-                                    onChange={handleTestChange}
-                                >
-                                    {tests.map((test) => (
-                                        <MenuItem
-                                            key={test.testId}
-                                            value={test.testId}
-                                            onClick={handleRunTimes}
-                                        >
-                                            {test.testName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </div>
+                    <ModuleSelect
+                        modules={modules}
+                        selectedModule={selectedModule}
+                        handleModuleChange={handleModuleChange}
+                        disabledModule={disabledModule}
+                        selectedProject={selectedProject}
+                    />
 
-                    {/* ...executions dropdown...*/}
-                    <div id='executionSelect' className='hidden'>
-                        <Box sx={{ display: 'flex' }}>
-                            <FormControl fullWidth>
-                                <InputLabel id="execution-selection">Executions</InputLabel>
-                                <Select
-                                    labelId="execution-selection"
-                                    id="select-execution"
-                                    label="execution"
-                                    value={selectedExecution}
-                                    onChange={handleExecutionChange}
-                                >
-                                    {testResults.map((testResult) => (
-                                        <MenuItem
-                                            key={testResult.id}
-                                            value={testResult.runId}
-                                            onClick={handleResultsDatagrid}
-                                        >
-                                            {testResult.runId}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </div>
+                    <TestSelect
+                        tests={tests}
+                        selectedTest={selectedTest}
+                        handleTestChange={handleTestChange}
+                        disabledTest={disabledTest}
+                        selectedModule={selectedModule}
+                    />
 
-
+                    <ExecutionsSelect
+                        testResults={testResults}
+                        handleExecutionChange={handleExecutionChange}
+                        handleResultsDatagrid={handleResultsDatagrid}
+                        disabledExecutions={disabledExecutions}
+                        selectedExecution={selectedExecution}
+                    />
                 </Box>
-                {/* ....datagrid....*/}
+                
                 <div id='datagridSelect2' className='hidden'>
                     <ResultComponent
                         testResultsByRunId={testResultsByRunId}

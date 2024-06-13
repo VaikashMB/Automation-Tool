@@ -29,7 +29,7 @@ const AddTestDialog = ({ selectedModule, onTestAdded }) => {
 
     return (
         <Box>
-            <Button onClick={handleClickOpen}>
+            <Button sx={{marginTop:'8px'}} onClick={handleClickOpen}>
                 <CreateNewFolderSharpIcon />
             </Button>
             <Dialog open={open} onClose={handleClose}>
