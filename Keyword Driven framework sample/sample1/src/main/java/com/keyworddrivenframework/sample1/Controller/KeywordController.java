@@ -56,7 +56,7 @@ public class KeywordController {
             return ResponseEntity.notFound().build();
         }
     }
-
+//to update the order of execution after drag and drop
     @PutMapping("/updateExecutionOrder/{testId}")
     public ResponseEntity<String> updateExecutionOrder(@PathVariable Test testId, @RequestBody List<ActionKeywords> actionKeywords) {
         List<ActionKeywords> updatedKeywords = keywordService.updateExecutionOrder(testId, actionKeywords);
@@ -112,4 +112,10 @@ public class KeywordController {
         }
         return ResponseEntity.ok(executionResults);
     }
+
+//    @PostMapping("/executeAll/{testId}")
+//    public ResponseEntity<List<TestResults>> executeAndRetrieveResults(@RequestBody ExecutionRequest requestBody, @PathVariable Test testId) {
+//        return keywordService.executeAndRetrieveResults(requestBody, testId);
+//    }
+
 }

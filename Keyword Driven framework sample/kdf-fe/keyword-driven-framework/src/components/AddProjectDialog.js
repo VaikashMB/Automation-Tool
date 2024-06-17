@@ -1,3 +1,4 @@
+//dialog box for adding a project. Displayed when the addNewFolderIcon is clicked.
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';

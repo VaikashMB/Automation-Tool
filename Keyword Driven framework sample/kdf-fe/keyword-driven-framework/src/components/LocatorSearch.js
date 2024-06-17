@@ -1,3 +1,4 @@
+//component for searching for a particular locator based on the locatorName
 import React, { useState } from 'react';
 import { TextField, Box, IconButton, InputAdornment } from '@mui/material';
 import axios from 'axios';

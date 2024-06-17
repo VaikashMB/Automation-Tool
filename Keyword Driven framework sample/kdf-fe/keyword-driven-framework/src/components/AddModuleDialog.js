@@ -1,3 +1,4 @@
+//dialog box for adding a module under a project. Displayed when the addNewFolderIcon is clicked.
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Box } from '@mui/material';
 import axios from 'axios';

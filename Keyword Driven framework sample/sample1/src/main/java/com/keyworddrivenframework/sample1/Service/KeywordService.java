@@ -1,21 +1,21 @@
 package com.keyworddrivenframework.sample1.Service;
 
-import com.keyworddrivenframework.sample1.Entity.ActionKeywords;
-import com.keyworddrivenframework.sample1.Entity.Locator;
-import com.keyworddrivenframework.sample1.Entity.Test;
-import com.keyworddrivenframework.sample1.Entity.TestResults;
+import com.keyworddrivenframework.sample1.Entity.*;
 import com.keyworddrivenframework.sample1.Repository.KeywordRepository;
 import com.keyworddrivenframework.sample1.Repository.LocatorRepository;
 import com.keyworddrivenframework.sample1.Repository.TestRepository;
 import com.keyworddrivenframework.sample1.Utils.TestExecutor;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static com.keyworddrivenframework.sample1.Utils.TestExecutor.getCurrentTime;
 
 @Service
 public class KeywordService {
@@ -76,7 +76,52 @@ public class KeywordService {
         return getActionKeywordsByTestId(testId);
     }
 
+//    public ResponseEntity<List<TestResults>> executeAndRetrieveResults(ExecutionRequest requestBody, Test testId) {
+//        resetExecutionResults();
+//
+//        List<Map<String, String>> keywordAction = requestBody.getActionKeyword();
+//        List<String> browsers = requestBody.getBrowsers();
+//        keywordAction.sort(Comparator.comparingDouble(action -> Double.parseDouble(action.get("orderOfExecution"))));
+//
+//        ExecutorService executorService = Executors.newFixedThreadPool(browsers.size());
+//        List<Future<?>> futures = new ArrayList<>();
+//
+//        if (browsers != null && !browsers.isEmpty()) {
+//            for (String browser : browsers) {
+//                futures.add(executorService.submit(() -> {
+//                    try {
+//                        openBrowser(browser);
+//                        String startTime = getCurrentTime() + " " + browser;
+//                        for (Map<String, String> actionKeywords : keywordAction) {
+//                            String flag = actionKeywords.get("flag");
+//
+//                            if (flag != null && flag.equalsIgnoreCase("Y")) {
+//                                executeKeyword(actionKeywords, testId, startTime);
+//                            }
+//                        }
+//                    } catch (IllegalArgumentException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }));
+//            }
+//            for (Future<?> future : futures) {
+//                try {
+//                    future.get();
+//                } catch (Exception e) {
+//                    executorService.shutdownNow();
+//                    throw new RuntimeException("Error executing test", e);
+//                }
+//            }
+//            executorService.shutdown();
+//        }
+//
+//        if (executionResults.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(executionResults);
+//    }
 
+//method for executing the test steps
     public void executeKeyword(Map<String, String> actionKeywords, Test testId, String startTime) {
 
         String runId = testId.getTestId() + "_" + startTime;
@@ -194,7 +239,7 @@ public class KeywordService {
         }
         executionResults.add(testResult);
     }
-
+//to reset the results after each execution
     public void resetExecutionResults() {
         executionResults.clear();
         testExecutorThreadLocal.get().resetExecutionFlag();

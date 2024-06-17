@@ -1,10 +1,13 @@
+//form for adding a new subtest or updating an existing sub test. Displayed when the add card is clicked or an existing sub test card is clicked.
 import { Box, Button, FormControlLabel, TextField, Typography, Checkbox, FormControl, InputLabel, Select, MenuItem, Stack } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
 import AddLocatorDialog from './AddLocatorDialog';
+import { fetchLocatorsUnderTestId } from './services.js/locatorService';
+import { deleteSubTest, fetchSubTestsUnderTest } from './services.js/testService';
 
-const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests, subTestData, subTestsLength }) => {
+const AddSubTestForm = ({ onClose, selectedTest, setSubTests, subTestData, subTestsLength }) => {
     const [showAddLocatorDialog, setShowAddLocatorDialog] = useState(false)
     const [errors, setErrors] = useState({})
     const [locatorOptions, setLocatorOptions] = useState([]);
@@ -43,13 +46,7 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
     useEffect(() => {
         //Under a selected test, the locators under that particular test will displayed in the dropdown.
         if (selectedTest) {
-            axios.get(`http://localhost:8081/getLocatorsUnderTestId/${selectedTest}`)
-                .then(response => {
-                    setLocatorOptions(response.data);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            fetchLocatorsUnderTestId(selectedTest).then(setLocatorOptions).catch(console.log)
         }
         //if an existing subtest is selected, the form is set with the saved data.
         if (subTestData) {
@@ -87,7 +84,7 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
                 .then(response => {
                     const newSubTest = response.data;
                     setSubTests(prevSubTests => [...prevSubTests, newSubTest]);
-                    fetchDataUnderTest(selectedTest);
+                    fetchSubTestsUnderTest(selectedTest).then(setSubTests).catch(console.log);
                     onClose();
                 })
                 .catch((error) => {
@@ -97,13 +94,10 @@ const AddSubTestForm = ({ onClose, selectedTest, fetchDataUnderTest, setSubTests
     }
     //function for deleting the existing subtests. 
     const handleDeleteOperation = () => {
-        axios.delete(`http://localhost:8081/keyword/delete/${subTestData.id}`)
+        deleteSubTest(subTestData.id)
             .then((response) => {
                 console.log(response.data);
-                if (response.status === 200) {
-                    setSubTests((prevData) => prevData.filter(row => row.id !== subTestData.id))
-                    onClose()
-                }
+                fetchSubTestsUnderTest(selectedTest).then(setSubTests).catch(console.log)
             })
             .catch((error) => {
                 console.log(error);

@@ -1,3 +1,4 @@
+//dialog box that displays when the delete icon in each locator card is clicked where we can confirm whether to delete the element or not.
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 

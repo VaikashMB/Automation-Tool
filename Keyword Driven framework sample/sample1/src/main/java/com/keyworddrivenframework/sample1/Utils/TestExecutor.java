@@ -187,7 +187,7 @@ public class TestExecutor {
             return "FAIL";
         }
     }
-
+//keyword for entering text in the provided element
     public String typeText(String locatorType, String locatorValue, String value, String locatorType2, String locatorValue2, Boolean screenshotValue, TestResults testResults) {
         try {
             if (isExecutionFailed()) return "ABORTED";
@@ -223,7 +223,7 @@ public class TestExecutor {
             return "FAIL";
         }
     }
-
+//keyword for clicking the provided element
     public String click(String locatorType, String locatorValue, String value, String locatorType2, String locatorValue2, Boolean screenshotValue, TestResults testResults) {
         try {
             if (isExecutionFailed()) return "ABORTED";

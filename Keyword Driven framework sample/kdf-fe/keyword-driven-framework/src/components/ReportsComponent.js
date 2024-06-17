@@ -1,3 +1,4 @@
+//component which displays the test results datagrid and the dropdowns
 import { Box } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react'
@@ -7,7 +8,8 @@ import ProjectSelect from './ProjectSelect';
 import ModuleSelect from './ModuleSelect';
 import TestSelect from './TestSelect';
 import ExecutionsSelect from './ExecutionsSelect';
-
+import { fetchModulesUnderProject } from './services.js/projectService';
+import { fetchTestsUnderModule } from './services.js/moduleService';
 
 const ReportsComponent = () => {
     //statevariable which stores all the projects available in the database.
@@ -40,30 +42,18 @@ const ReportsComponent = () => {
             .then((response) => setProjects(response.data))
             .catch((error) => console.log(error))
     }
-    //function for fetching all the modules available under a particular  project and setting it to the state variable "modules".
-    const fetchModulesUnderProject = (projectId) => {
-        axios.get(`http://localhost:8081/project/modules/${projectId}`)
-            .then((response) => setModules(response.data))
-            .catch((error) => console.log(error))
-    }
     //function for setting the projectId  in the state variable "selectedProject" when an item is selected from the dropdown menu and fetch Modules based on that projectId.
     const handleProjectChange = (event) => {
         const projectId = event.target.value
         setSelectedProject(projectId)
-        fetchModulesUnderProject(projectId)
+        fetchModulesUnderProject(projectId).then(setModules).catch(console.log)
         setDisabledModule(false)
-    }
-    //function for fetching all the tests available under a module and adding them to the state variable "tests".
-    const fetchTestsUnderModule = (moduleId) => {
-        axios.get(`http://localhost:8081/tests/${moduleId}`)
-            .then((response) => setTests(response.data))
-            .catch((error) => console.log(error))
     }
     //function for setting the moduleId in the state variable 'selectedModule' when an option is selected from the dropdown menu and fetch tests based on that moduleId.
     const handleModuleChange = (event) => {
         const moduleId = event.target.value
         setSelectedModule(moduleId)
-        fetchTestsUnderModule(moduleId)
+        fetchTestsUnderModule(moduleId).then(setTests).catch(console.log)
         setDisabledTest(false)
     }
     //function for fetching TestResults by TestId and setting it to the state variable "testResults".Also filtering the TestResults by runId so that the RunId is not repeated while selecting from dropdown.
@@ -108,7 +98,6 @@ const ReportsComponent = () => {
     return (
         //main container//
         <Box>
-            {/* .......heading Test Results...... */}
             <Box>
                 <Typography variant='h3' align='center' marginBottom={2}>
                     Test Results

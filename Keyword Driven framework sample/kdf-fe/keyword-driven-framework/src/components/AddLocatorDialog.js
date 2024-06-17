@@ -1,3 +1,4 @@
+//dialog box for adding a new locator. Displayed when addnew button in the addsubtestform is clicked.
 import React, { useState, useEffect } from 'react'
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import axios from 'axios'

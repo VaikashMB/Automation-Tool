@@ -1,5 +1,5 @@
+//Elemets Tab , where all the elements are displayed and the deletion and updation of the added elements are controlled
 import { Box, Typography } from '@mui/material'
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import AddLocatorDialog from './AddLocatorDialog';
 import ConfirmationDialog from './ConfirmationDialog';
@@ -8,7 +8,9 @@ import ProjectSelect from './ProjectSelect';
 import ModuleSelect from './ModuleSelect';
 import TestSelect from './TestSelect';
 import AddedLocators from './AddedLocators';
-
+import { deleteLocator, fetchLocators, fetchLocatorsUnderTestId } from './services.js/locatorService';
+import { fetchModulesUnderProject, fetchProjects } from './services.js/projectService';
+import { fetchTestsUnderModule } from './services.js/moduleService';
 
 const Elements = () => {
     const [locators, setLocators] = useState([])
@@ -16,18 +18,14 @@ const Elements = () => {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
     const [locatorToDelete, setLocatorToDelete] = useState(null)
-
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState('');
     const [modules, setModules] = useState([]);
     const [selectedModule, setSelectedModule] = useState('');
     const [tests, setTests] = useState([]);
     const [selectedTest, setSelectedTest] = useState('');
-
-    //disabledModule , disabledTest used to initially disable the module and test dropdowns. Only when a project is selected, they will be set to false.
     const [disabledModule, setDisabledModule] = useState(true)
     const [disabledTest, setDisabledTest] = useState(true)
-    //if true, then when a non-existing locator is searched , it displays 'NO Results Found'.
     const [noResults, setNoResults] = useState(false)
     //function to search for a particular locator . Display "No Results" , if it does not exist.
     const handleSearch = (searchResults) => {
@@ -38,25 +36,15 @@ const Elements = () => {
     const handleClearSearch = (selectedTest) => {
         setNoResults(false);
         if (selectedTest) {
-            fetchLocatorsUnderTestId(selectedTest);
+            fetchLocatorsUnderTestId(selectedTest).then(setLocators).catch(console.log)
         } else {
-            fetchLocators();
+            fetchLocators().then(setLocators).catch(console.log)
         }
     };
     //fetches all locators when the component mounts
     useEffect(() => {
-        fetchLocators()
-    }, [])
-    //function for fetching all the locators and store in the state variable 'locators'.
-    const fetchLocators = () => {
-        axios.get("http://localhost:8081/getLocators")
-            .then((response) => {
-                setLocators(response.data)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
+        fetchLocators().then(setLocators).catch(console.log);
+    }, []);
     //On clicking the edit icon in each locator, the form appears with the respective locator data.
     const handleEditClick = (locator) => {
         setSelectedLocator(locator)
@@ -72,8 +60,7 @@ const Elements = () => {
         setLocators((prevLocators) =>
             prevLocators.map((locator) =>
                 locator.locatorId === updatedLocator.locatorId ? updatedLocator : locator
-            )
-        )
+            ))
     }
     //function for displaying the confirmation box for deleting a locator.
     const handleDeleteClick = (locator) => {
@@ -87,7 +74,7 @@ const Elements = () => {
     }
     //function for deleting a locator.
     const handleDeleteConfirm = () => {
-        axios.delete(`http://localhost:8081/deleteLocator/${locatorToDelete.locatorId}`)
+        deleteLocator(locatorToDelete.locatorId)
             .then(() => {
                 setLocators((prevLocators) =>
                     prevLocators.filter((locator) => locator.locatorId !== locatorToDelete.locatorId)
@@ -99,55 +86,31 @@ const Elements = () => {
                 console.log(error)
             })
     }
-    //function for fetching projects.
-    const fetchProjects = () => {
-        axios.get("http://localhost:8081/allProjects")
-            .then((response) => setProjects(response.data))
-            .catch((error) => console.log(error))
-    }
     //function for setting the selected project in a state variable and fetch modules under the selected project.
     const handleProjectChange = (event) => {
         const projectId = event.target.value;
         setSelectedProject(projectId);
-        fetchModulesUnderProject(projectId);
+        fetchModulesUnderProject(projectId).then(setModules).catch(console.log)
         setDisabledModule(false)
     };
-    //function for fetching modules under the selected project
-    const fetchModulesUnderProject = (projectId) => {
-        axios.get(`http://localhost:8081/project/modules/${projectId}`)
-            .then((response) => setModules(response.data))
-            .catch((error) => console.log(error))
-    }
     //function for setting the selected module in a state variable and fetch tests under the selected module.
     const handleModuleChange = (event) => {
         const moduleId = event.target.value;
         setSelectedModule(moduleId);
-        fetchTestsUnderModule(moduleId);
+        fetchTestsUnderModule(moduleId).then(setTests).catch(console.log)
         setDisabledTest(false)
-    }
-    //function for fetching tests under the selected module.
-    const fetchTestsUnderModule = (moduleId) => {
-        axios.get(`http://localhost:8081/tests/${moduleId}`)
-            .then((response) => setTests(response.data))
-            .catch((error) => console.log(error))
     }
     //function for setting the selected test in a state variable and fetch the locators under the particular test.
     const handleTestChange = (event) => {
         const testId = event.target.value;
         setSelectedTest(testId);
         setNoResults(false)
-        fetchLocatorsUnderTestId(testId);
-    };
-    //function for fetching the locators under the selected test
-    const fetchLocatorsUnderTestId = (testId) => {
-        axios.get(`http://localhost:8081/getLocatorsUnderTestId/${testId}`)
-            .then((response) => setLocators(response.data))
-            .catch((error) => console.log(error));
+        fetchLocatorsUnderTestId(testId).then(setLocators).catch(console.log)
     };
     //fetch the modules only if a project is selected, else keep the modules , tests as unfetched.
     useEffect(() => {
         if (selectedProject) {
-            fetchModulesUnderProject(selectedProject);
+            fetchModulesUnderProject(selectedProject).then(setModules).catch(console.log)
         }
         setModules([]);
         setSelectedModule('');
@@ -157,7 +120,7 @@ const Elements = () => {
     //fetch the tests only if a module is selected, else keep the tests as unfetched.
     useEffect(() => {
         if (selectedModule) {
-            fetchTestsUnderModule(selectedModule);
+            fetchTestsUnderModule(selectedModule).then(setTests).catch(console.log)
         }
         setTests([]);
         setSelectedTest('');
@@ -165,9 +128,9 @@ const Elements = () => {
     //fetch the locators under a test only if a test is selected, else fetch all the locators.
     useEffect(() => {
         if (selectedTest) {
-            fetchLocatorsUnderTestId(selectedTest)
+            fetchLocatorsUnderTestId(selectedTest).then(setLocators).catch(console.log)
         } else {
-            fetchLocators()
+            fetchLocators().then(setLocators).catch(console.log)
         }
     }, [selectedTest])
 
@@ -185,7 +148,7 @@ const Elements = () => {
                         projects={projects}
                         selectedProject={selectedProject}
                         handleProjectChange={handleProjectChange}
-                        fetchProjects={fetchProjects}
+                        fetchProjects={() => fetchProjects().then(setProjects).catch(console.log)}
                     />
                     <ModuleSelect
                         modules={modules}
@@ -209,7 +172,6 @@ const Elements = () => {
                     No Locators Found
                 </Typography>
             ) : (
-
                 <AddedLocators
                     locators={locators}
                     handleDeleteClick={handleDeleteClick}

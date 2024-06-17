@@ -1,3 +1,4 @@
+//dropdown for displaying the projects
 import React from 'react';
 import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 

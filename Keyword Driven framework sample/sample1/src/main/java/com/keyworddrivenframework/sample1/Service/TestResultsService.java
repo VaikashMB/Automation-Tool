@@ -15,18 +15,18 @@ public class TestResultsService {
     public TestResultsService(TestResultsRepository testResultsRepository) {
         this.testResultsRepository = testResultsRepository;
     }
-
+    //to post testResults
     public List<TestResults> postTestResults(List<TestResults> testResults) {
         for (TestResults testResult : testResults) {
             testResultsRepository.save(testResult);
         }
         return testResults;
     }
-
+//to fetch testResults by runId
     public List<TestResults> getTestResultsByRunId(String runId) {
         return testResultsRepository.findTestResultsByRunId(runId);
     }
-
+//to fetch testResults by testId
     public List<TestResults> getTestResultsByTestId(Test testId) {
         return testResultsRepository.findByTestId(testId);
     }

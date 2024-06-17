@@ -1,3 +1,4 @@
+//component that shows the different types of browser checkboxes where we can handle the type of browser to be selected.
 import { Box } from '@mui/material';
 import React from 'react'
 import { FaChrome, FaEdge } from 'react-icons/fa';

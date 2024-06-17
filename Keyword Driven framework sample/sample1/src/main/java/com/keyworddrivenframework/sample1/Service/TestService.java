@@ -15,11 +15,11 @@ public class TestService {
     public TestService(TestRepository testRepository) {
         this.testRepository = testRepository;
     }
-
+//to fetch all tests in a particular module
     public List<Test> getAllTestsByModuleId(Module moduleId){
         return testRepository.findByModuleId(moduleId);
     }
-
+//to add test under a particular module
     public Test addTestUnderModule(Module moduleId, Test test) {
         test.setModuleId(moduleId);
         return testRepository.save(test);

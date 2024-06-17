@@ -16,24 +16,24 @@ public class LocatorService {
     public LocatorService(LocatorRepository locatorRepository) {
         this.locatorRepository = locatorRepository;
     }
-
+//to fetch all locators
     public List<Locator> getAllLocators(){
         return locatorRepository.findAll();
     }
-
+//to add a locator
     public Locator addLocator(Locator locator){
         return locatorRepository.save(locator);
     }
-
+//to add a locator under a particular test
     public Locator addLocatorUnderTestId(Test testId, Locator locator) {
         locator.setTestId(testId);
         return locatorRepository.save(locator);
     }
-
+//to fetch locators under a particular test
     public List<Locator> getLocatorsUnderTestId(Test testId) {
         return locatorRepository.findByTestId(testId);
     }
-
+//to update a locator
     public Locator updateLocator(int locatorId, Locator updatedLocator) {
         Optional<Locator> optionalLocator = locatorRepository.findById(locatorId);
         if (optionalLocator.isPresent()) {
@@ -48,15 +48,15 @@ public class LocatorService {
             throw new RuntimeException("Locator not found with id " + locatorId);
         }
     }
-
+//to delete a locator by locatorId
     public void deleteLocator(int locatorId) {
         locatorRepository.deleteById(locatorId);
     }
-
+//to search for a locator by locatorName
     public List<Locator> searchLocators(String query) {
         return locatorRepository.findByLocatorNameContainingIgnoreCase(query);
     }
-
+//to search for a locator by locatorName under a particular test
     public List<Locator> searchLocators(Test testId,String query) {
         return locatorRepository.findByTestIdAndLocatorNameContainingIgnoreCase(testId,query);
     }

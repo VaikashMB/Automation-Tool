@@ -1,6 +1,6 @@
+//component which shows the project, module, test dropdowns along with the browser checkboxes , where the test steps are displayed and the form for adding subtests are displayed.
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
-import axios from 'axios';
 import AddSubTestForm from './AddSubTestForm';
 import Browsers from './Browsers';
 import ProjectSelect from './ProjectSelect';
@@ -10,8 +10,11 @@ import AddProjectDialog from './AddProjectDialog';
 import AddModuleDialog from './AddModuleDialog';
 import AddTestDialog from './AddTestDialog'
 import SubTests from './SubTests';
+import { fetchModulesUnderProject, fetchProjects } from './services.js/projectService';
+import { fetchTestsUnderModule } from './services.js/moduleService';
+import { executeAllKeywords, fetchSubTestsUnderTest, postTestResults, updateExecutionOrder } from './services.js/testService';
 
-const DragAndDrop = () => {
+const Home = () => {
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState('');
     const [modules, setModules] = useState([]);
@@ -28,7 +31,6 @@ const DragAndDrop = () => {
     const [disabledTest, setDisabledTest] = useState(true)
 
     useEffect(() => {
-        console.log(isChecked);
     }, [isChecked]);
 
     useEffect(() => {
@@ -50,69 +52,43 @@ const DragAndDrop = () => {
     const handleExecution = () => {
         const payload = {
             browsers: selectedBrowsers,
-            actionKeyword: rows
+            actionKeyword: rows,
         };
-        console.log("Executing with payload:", payload);
 
-        axios.post(`http://localhost:8081/keyword/executeAll/${selectedTest}`, payload)
+        executeAllKeywords(selectedTest, payload)
             .then((response) => {
-                axios.post("http://localhost:8081/postTestResults", response.data)
-                    .then((response) => {
-                        console.log("Data posted to testResults db:", response);
-                    })
-                    .catch((response) => {
-                        console.error("Error posting data to testResults db:", response);
-                    });
+                postTestResults(response).catch((error) => {
+                    console.error('Error posting data to testResults db:', error);
+                });
             })
             .catch((error) => {
-                console.error("Error executing all keywords:", error);
+                console.error('Error executing all keywords:', error);
             });
     };
-    //function for fetching the projects
-    const fetchProjects = () => {
-        axios.get("http://localhost:8081/allProjects")
-            .then((response) => setProjects(response.data))
-            .catch((error) => console.log(error))
-    }
-    //function for fetching the modules under the selected project
-    const fetchModulesUnderProject = (projectId) => {
-        axios.get(`http://localhost:8081/project/modules/${projectId}`)
-            .then((response) => setModules(response.data))
-            .catch((error) => console.log(error))
-    }
+
     //to store the selected project into a state variable
     const handleProjectChange = (event) => {
         const projectId = event.target.value;
         setSelectedProject(projectId);
-        fetchModulesUnderProject(projectId);
+        fetchModulesUnderProject(projectId).then(setModules).catch(console.log)
         setShowAddSubTestForm(false);
         setDisabledModule(false)
     };
-    //function to fetch tests under the selected module
-    const fetchTestsUnderModule = (moduleId) => {
-        axios.get(`http://localhost:8081/tests/${moduleId}`)
-            .then((response) => setTests(response.data))
-            .catch((error) => console.log(error))
-    }
+
     //to store the selected module into a state variable.
     const handleModuleChange = (event) => {
         const moduleId = event.target.value;
         setSelectedModule(moduleId);
-        fetchTestsUnderModule(moduleId);
+        fetchTestsUnderModule(moduleId).then(setTests).catch(console.log)
         setShowAddSubTestForm(false);
         setDisabledTest(false)
     }
-    //function to fetch data under the selected test.
-    const fetchDataUnderTest = (testId) => {
-        axios.get(`http://localhost:8081/keyword/subTests/${testId}`)
-            .then((response) => setSubTests(response.data))
-            .catch((error) => console.log(error))
-    }
+
     //to store the selected test into a state variable
     const handleTestChange = (event) => {
         const testId = event.target.value;
         setSelectedTest(testId);
-        fetchDataUnderTest(testId);
+        fetchSubTestsUnderTest(testId).then(setSubTests).catch(console.log)
     }
     //function to handle the subtest adding form. If the subTest is null, the form appears with the next order of execution. If not null, the form appears with the saved data.
     const handleAddSubTest = (subTest = null) => {
@@ -148,10 +124,10 @@ const DragAndDrop = () => {
         }));
 
         // Send updated order to the backend
-        axios.put(`http://localhost:8081/keyword/updateExecutionOrder/${selectedTest}`, updatedOrder)
+        updateExecutionOrder(selectedTest, updatedOrder)
             .then((response) => {
                 console.log("Order updated successfully:", response);
-                fetchDataUnderTest(selectedTest)
+                fetchSubTestsUnderTest(selectedTest).then(setSubTests).catch(console.log)
             })
             .catch((error) => {
                 console.error("Error updating order:", error);
@@ -160,7 +136,7 @@ const DragAndDrop = () => {
 
     useEffect(() => {
         if (selectedProject) {
-            fetchModulesUnderProject(selectedProject);
+            fetchModulesUnderProject(selectedProject).then(setModules).catch(console.log)
         } else {
         }
         setModules([]);
@@ -173,7 +149,7 @@ const DragAndDrop = () => {
 
     useEffect(() => {
         if (selectedModule) {
-            fetchTestsUnderModule(selectedModule);
+            fetchTestsUnderModule(selectedModule).then(setTests).catch(console.log)
         } else {
         }
         setTests([]);
@@ -184,7 +160,7 @@ const DragAndDrop = () => {
 
     useEffect(() => {
         if (selectedTest) {
-            fetchDataUnderTest(selectedTest);
+            fetchSubTestsUnderTest(selectedTest).then(setSubTests).catch(console.log)
             setIsCardsVisible(true);
         } else {
             setIsCardsVisible(false);
@@ -194,13 +170,13 @@ const DragAndDrop = () => {
 
     const refreshModules = () => {
         if (selectedProject) {
-            fetchModulesUnderProject(selectedProject);
+            fetchModulesUnderProject(selectedProject).then(setModules).catch(console.log)
         }
     };
 
     const refreshTests = () => {
         if (selectedModule) {
-            fetchTestsUnderModule(selectedModule);
+            fetchTestsUnderModule(selectedModule).then(setTests).catch(console.log)
         }
     };
 
@@ -209,12 +185,12 @@ const DragAndDrop = () => {
             <Box sx={{ width: '55%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {/* ...dropdowns... */}
                 <Box sx={{ width: '20%', paddingRight: '10px', display: 'flex', gap: 2 }}>
-                    <AddProjectDialog onProjectAdded={fetchProjects} />
+                    <AddProjectDialog onProjectAdded={() => fetchProjects().then(setProjects).catch(console.log)} />
                     <ProjectSelect
                         projects={projects}
                         selectedProject={selectedProject}
                         handleProjectChange={handleProjectChange}
-                        fetchProjects={fetchProjects}
+                        fetchProjects={() => fetchProjects().then(setProjects).catch(console.log)}
                     />
                     <AddModuleDialog selectedProject={selectedProject} onModuleAdded={refreshModules} />
                     <ModuleSelect
@@ -256,7 +232,6 @@ const DragAndDrop = () => {
                     <AddSubTestForm
                         onClose={handleCloseAddSubTestForm}
                         selectedTest={selectedTest}
-                        fetchDataUnderTest={fetchDataUnderTest}
                         setSubTests={setSubTests}
                         subTestData={selectedSubTest}
                         subTestsLength={subTests.length}
@@ -267,7 +242,7 @@ const DragAndDrop = () => {
     );
 };
 
-export default DragAndDrop;
+export default Home;
 
 
 

@@ -1,8 +1,9 @@
+//tabs component
 import { Box, Tab } from '@mui/material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import React, { useState } from 'react'
-import DragAndDrop from './DragAndDrop'
 import Elements from './Elements'
+import Home from './Home'
 
 const Tabs1 = () => {
     //state variable for storing the current tab value and for setting the tab value
@@ -25,7 +26,7 @@ const Tabs1 = () => {
                         <Tab label='Parameters' value='5'></Tab>
                     </TabList>
                 </Box>
-                <TabPanel value='1'><DragAndDrop /></TabPanel>
+                <TabPanel value='1'><Home /></TabPanel>
                 <TabPanel value='2'><Elements /></TabPanel>
                 <TabPanel value='3'>3</TabPanel>
                 <TabPanel value='4'>4</TabPanel>
